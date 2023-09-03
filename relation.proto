@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+option go_package = "relation";
+
+package relation;
+
+// /douyin/relation/action/ - 关系操作
+message douyin_relation_action_request {
+  int64 user_id = 1; // 用户id
+  int64 to_user_id = 2; // 对方用户id
+  int32 action_type = 3; // 1-关注，2-取消关注
+}
+
+message douyin_relation_action_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+}
+
+// /douyin/relatioin/follow/list/ - 用户关注列表
+message douyin_relation_follow_list_request {
+  int64 user_id = 1; // 用户id
+}
+
+message douyin_relation_follow_list_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated User user_list = 3; // 用户信息列表
+}
+
+// /douyin/relation/follower/list/ - 用户粉丝列表
+message douyin_relation_follower_list_request {
+  int64 user_id = 1; // 用户id
+}
+
+message douyin_relation_follower_list_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated User user_list = 3; // 用户列表
+}
+
+// /douyin/relation/friend/list/ - 用户好友列表
+message douyin_relation_friend_list_request {
+  int64 user_id = 1; // 用户id
+}
+
+message douyin_relation_friend_list_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated FriendUser user_list = 3; // 用户列表
+}
+
+//根据当前用户id和目标用户id来判断当前用户是否关注了目标用户
+message douyin_relation_isfollow_request {
+  int64 user_id = 1; //当前用户id
+  int64 target_id = 2; // 目标用户id
+}
+
+message douyin_relation_isfollow_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  bool is_follow = 3; // 是否关注目标用户
+}
+
+//根据用户id来查询用户关注了多少其它用户
+message douyin_relation_followee_count_request {
+  int64 user_id = 1; // 用户id
+}
+
+message douyin_relation_followee_count_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  int64 followee_count = 3; // 用户关注数
+}
+
+//根据用户id来查询用户被多少其他用户关注
+message douyin_relation_follower_count_request {
+  int64 user_id = 1; // 用户id
+}
+
+message douyin_relation_follower_count_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  int64 follower_count = 3; // 用户粉丝数
+}
+
+message User {
+  int64 id = 1; // 用户id
+  string name = 2; // 用户名称
+  int64 follow_count = 3; // 关注总数
+  int64 follower_count = 4; // 粉丝总数
+  bool is_follow = 5; // true-已关注，false-未关注
+  string avatar = 6; //用户头像
+  string background_image = 7; //用户个人页顶部大图
+  string signature = 8; //个人简介
+  int64 total_favorited = 9; //获赞数量
+  int64 work_count = 10; //作品数量
+  int64 favorite_count = 11; //点赞数量
+}
+
+message FriendUser {
+  string message = 1; // 和该好友的最新聊天消息
+  int64 msgType = 2; // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
+  User user = 3;
+}
+
+message douyin_relation_get_friend_list_request {
+  int64 user_id = 1; //用户id
+  repeated User friend_list = 2; // 好友列表
+}
+
+message douyin_relation_get_friend_list_response {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated FriendUser friend_list = 3; // 好友列表
+}
+
+service RelationService {
+    //内部提供调用接口
+    //该id用户是否关注了目标id用户
+    rpc IsFollow (douyin_relation_isfollow_request) returns (douyin_relation_isfollow_response);
+    rpc GetFolloweeCount (douyin_relation_followee_count_request) returns (douyin_relation_followee_count_response);
+    //根据id获取其粉丝数
+    rpc GetFollowerCount (douyin_relation_follower_count_request) returns (douyin_relation_follower_count_response);
+    //根据id获取好友列表
+    rpc GetFriendsList (douyin_relation_get_friend_list_request) returns (douyin_relation_get_friend_list_response);
+
+    //外部调用接口
+    //用户关注取关功能
+    rpc Action (douyin_relation_action_request) returns (douyin_relation_action_response);
+    //获取关注列表
+    rpc GetFolloweeList (douyin_relation_follow_list_request) returns (douyin_relation_follow_list_response);
+    //获取粉丝列表
+    rpc GetFollowerList (douyin_relation_follower_list_request) returns (douyin_relation_follower_list_response);
+    //获取好友列表
+    rpc GetFriendList (douyin_relation_friend_list_request) returns (douyin_relation_friend_list_response);
+}

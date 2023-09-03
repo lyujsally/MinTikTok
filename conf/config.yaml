@@ -1,0 +1,40 @@
+name: "web_app"
+mode: "dev"
+port: 3323
+version: "v0.0.1"
+start_time: "2023-07-01"
+machine_id: 1
+auth:
+  jwt_expires: 24
+log:
+  level: "debug"
+  filename: "web_app.log"
+  max_size: 200
+  max_age: 30
+  max_backups: 7
+mysql:
+  host: "116.205.247.243"
+  port: 3306
+  user: "root"
+  password: "8871527yhk"
+  db_name: "Mintiktok"
+  max_open_conns: 10
+  max_idle_conns: 5
+redis:
+  host: "43.138.198.167"
+  port: 6379
+  password: ""
+  db: 0
+  pool_size: 100
+kafka:
+  topic1: "msg"
+  topic2: "follow"
+  topic3: "unfollow"
+  broker: ["43.138.198.167:9092"]
+etcd:
+    servicename: "relationService"
+    endpoints: ["43.138.198.167:2379"]
+    serviceaddr: "0.0.0.0:3333"
+    dial_timeout: 5
+
+project_path: MinTikTok
